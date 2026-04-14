@@ -4,30 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Gerador de Wallpaper Spotify</title>
+    <title>spotiPaper — Gerador de Wallpaper Spotify | 1080×1920 PNG</title>
 
-    <meta name="description" content="Gere wallpapers personalizados a partir de músicas e álbuns do Spotify. Extraia a paleta de cores da capa, crie fundos 1080×1920 minimalistas e baixe em PNG.">
-    <meta name="keywords" content="Spotify, wallpaper, gerador de papel de parede, paleta de cores, álbum, música, PNG, 1080x1920, capa do álbum">
+    <meta name="description" content="Gere wallpapers 1080×1920 personalizados a partir de músicas e álbuns do Spotify. Extrai automaticamente a paleta de cores da capa do álbum e cria um layout minimalista. Download gratuito em PNG.">
+    <meta name="keywords" content="gerador de wallpaper Spotify, papel de parede Spotify, wallpaper álbum Spotify, paleta de cores capa álbum, wallpaper musical 1080x1920, Spotify wallpaper generator, spotiPaper">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://seu-dominio.com/">
+    <meta name="author" content="Breno Alvim">
+    <link rel="canonical" href="https://spotipaper.vercel.app/">
     <meta name="theme-color" content="#1DB954">
 
         <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
-    <meta property="og:site_name" content="Gerador de Wallpaper Spotify">
-    <meta property="og:title" content="Gerador de Wallpaper Spotify">
-    <meta property="og:description" content="Crie wallpapers personalizados com paleta de cores das suas músicas e álbuns favoritos do Spotify.">
-    <meta property="og:url" content="https://seu-dominio.com/">
+    <meta property="og:site_name" content="spotiPaper">
+    <meta property="og:title" content="spotiPaper — Gerador de Wallpaper Spotify 1080×1920">
+    <meta property="og:description" content="Gere wallpapers 1080×1920 personalizados a partir de músicas e álbuns do Spotify. Paleta de cores extraída automaticamente da capa do álbum. Download gratuito em PNG.">
+    <meta property="og:url" content="https://spotipaper.vercel.app/">
     <meta property="og:image" content="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_Green.png">
-    <meta property="og:image:alt" content="Logo do Spotify (genérica)">
+    <meta property="og:image:alt" content="spotiPaper — Gerador de Wallpaper Spotify">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
         <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gerador de Wallpaper Spotify">
-    <meta name="twitter:description" content="Crie wallpapers personalizados com paleta de cores das suas músicas e álbuns favoritos do Spotify.">
+    <meta name="twitter:site" content="@obrenoalvim">
+    <meta name="twitter:title" content="spotiPaper — Gerador de Wallpaper Spotify 1080×1920">
+    <meta name="twitter:description" content="Gere wallpapers 1080×1920 personalizados a partir de músicas e álbuns do Spotify. Paleta de cores extraída automaticamente. Download gratuito em PNG.">
     <meta name="twitter:image" content="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_Green.png">
-    <meta name="twitter:image:alt" content="Logo do Spotify (genérica)">
+    <meta name="twitter:image:alt" content="spotiPaper — Gerador de Wallpaper Spotify">
 
         <link rel="icon" type="image/png" href="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_Green.png">
 
@@ -36,16 +38,125 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
         <script type="application/ld+json">
+    [
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Gerador de Wallpaper Spotify",
-        "url": "https://seu-dominio.com/",
+        "name": "spotiPaper",
+        "alternateName": "Gerador de Wallpaper Spotify",
+        "url": "https://spotipaper.vercel.app/",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Web",
-        "description": "Gere wallpapers personalizados a partir de músicas e álbuns do Spotify e baixe em PNG.",
-        "inLanguage": "pt-BR"
+        "description": "Gere wallpapers 1080×1920 personalizados a partir de músicas e álbuns do Spotify. Extrai automaticamente a paleta de cores da capa do álbum e cria um layout minimalista para download gratuito em PNG.",
+        "inLanguage": "pt-BR",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "BRL"
+        },
+        "featureList": [
+          "Geração de wallpaper 1080×1920 em PNG",
+          "Extração automática de paleta de cores via ColorThief",
+          "Suporte a músicas e álbuns do Spotify",
+          "Autenticação OAuth2 PKCE com Spotify",
+          "Funciona sem login via fallback oEmbed",
+          "Personalização de cores, gradiente e vinheta",
+          "Spotify Code no wallpaper"
+        ],
+        "author": {
+          "@type": "Person",
+          "name": "Breno Alvim",
+          "url": "https://github.com/obrenoalvim"
+        },
+        "codeRepository": "https://github.com/obrenoalvim/spotiPaper"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Como gerar um wallpaper do Spotify",
+        "description": "Passo a passo para criar um wallpaper personalizado 1080×1920 a partir de uma música ou álbum do Spotify usando o spotiPaper.",
+        "inLanguage": "pt-BR",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Conectar com o Spotify (opcional)",
+            "text": "Clique em 'Conectar com Spotify' para autenticar via OAuth2 e obter metadados completos, como duração das faixas."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Cole a URL da música ou álbum",
+            "text": "Cole o link de uma música (open.spotify.com/track/...) ou álbum (open.spotify.com/album/...) no campo de URL."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Gerar o wallpaper",
+            "text": "Clique em 'Gerar Wallpaper'. O app extrai a capa do álbum, gera a paleta de cores automaticamente e renderiza o wallpaper 1080×1920 no canvas."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Personalizar (opcional)",
+            "text": "Ajuste cor de fundo, cor de acento, intensidade do gradiente, direção, cor do texto e vinheta conforme preferir."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 5,
+            "name": "Baixar em PNG",
+            "text": "Clique em 'Baixar PNG' para salvar o wallpaper personalizado no seu dispositivo."
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "pt-BR",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Preciso de conta no Spotify para usar o spotiPaper?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Não. Sem login, o app usa o oEmbed do Spotify para obter metadados básicos (título, artista e capa). Com login via OAuth2, você obtém dados completos como duração das faixas."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Qual é o tamanho do wallpaper gerado?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "O wallpaper é gerado em 1080×1920 pixels, formato portrait ideal para papel de parede de celular."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Em qual formato o wallpaper é baixado?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "O download é feito em PNG, sem perda de qualidade."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Como a paleta de cores é gerada?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A paleta é extraída automaticamente da capa do álbum usando a biblioteca ColorThief, que identifica a cor dominante e até 5 cores representativas da imagem."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O spotiPaper funciona com álbuns ou apenas com músicas?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Funciona com ambos. Cole o link de uma música (open.spotify.com/track/...) ou de um álbum (open.spotify.com/album/...) e o app processa os dois tipos."
+            }
+          }
+        ]
       }
+    ]
     </script>
 </head>
 <body>
@@ -125,7 +236,6 @@
 
                     <div class="loading" id="loading" aria-live="polite">
                         <div class="spinner" aria-hidden="true"></div>
-                        <p>Gerando wallpaper...</p>
                         <p>Gerando wallpaper...</p>
                     </div>
 

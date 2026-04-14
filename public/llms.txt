@@ -1,0 +1,46 @@
+# spotiPaper — Gerador de Wallpaper Spotify
+
+## O que é
+
+spotiPaper é uma aplicação web gratuita que gera wallpapers 1080×1920 personalizados a partir de músicas e álbuns do Spotify. O app extrai automaticamente a paleta de cores da capa do álbum e cria um layout minimalista pronto para download em PNG.
+
+## Para quem é
+
+- Usuários do Spotify que querem wallpapers temáticos das suas músicas favoritas
+- Designers e entusiastas que buscam papéis de parede gerados automaticamente com paleta de cores extraída
+- Qualquer pessoa que queira personalizar o celular/desktop com arte de álbum
+
+## Como funciona
+
+1. Conecte-se opcionalmente com sua conta Spotify (via OAuth2 PKCE) para obter metadados completos
+2. Cole a URL de uma música ou álbum do Spotify (ex.: https://open.spotify.com/track/...)
+3. O app extrai a capa do álbum e gera uma paleta de 5 cores com ColorThief
+4. Um wallpaper 1080×1920 é renderizado no Canvas com gradiente, paleta, título, artista e Spotify Code
+5. Baixe o resultado em PNG com um clique
+
+## Principais funcionalidades
+
+- Geração de wallpaper 1080×1920 (formato portrait para celular)
+- Extração automática de paleta de cores da capa do álbum
+- Suporte a músicas e álbuns do Spotify
+- Funciona sem login via fallback oEmbed (metadados básicos)
+- Com login OAuth2 PKCE: dados completos incluindo duração
+- Personalização: cor de fundo, cor de acento, gradiente, vinheta, cor do texto
+- Download em PNG
+- Interface responsiva
+
+## Tecnologias
+
+- Vite 5 (bundler)
+- ColorThief (extração de paleta)
+- Spotify Web API + oEmbed
+- Canvas API (renderização)
+- OAuth2 PKCE (autenticação client-side)
+
+## URL
+
+https://spotipaper.vercel.app/
+
+## Repositório
+
+https://github.com/obrenoalvim/spotiPaper
