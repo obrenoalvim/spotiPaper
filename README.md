@@ -1,5 +1,7 @@
 # Gerador de Wallpaper Spotify
 
+[![CI](https://github.com/obrenoalvim/spotiPaper/actions/workflows/ci.yml/badge.svg)](https://github.com/obrenoalvim/spotiPaper/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Aplicação web que gera wallpapers 1080×1920 a partir de músicas e álbuns do Spotify. O app extrai a paleta de cores da capa, cria um layout minimalista e permite baixar em PNG. Funciona mesmo sem login (via oEmbed), com dados mais completos quando autenticado.
 
 ## Funcionalidades
