@@ -1,0 +1,13 @@
+/* TEAM */
+Developer: Breno Alvim
+Site: https://github.com/obrenoalvim
+GitHub: https://github.com/obrenoalvim/spotiPaper
+
+/* THANKS */
+ColorThief: https://github.com/lokesh/color-thief
+Spotify Web API & oEmbed: https://developer.spotify.com/
+
+/* SITE */
+Language: Portuguese (Brazil)
+Framework: Vite (vanilla JS)
+Components: JavaScript, Canvas API
