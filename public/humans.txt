@@ -1,7 +1,7 @@
 /* TEAM */
 Developer: Breno Alvim
 Site: https://github.com/obrenoalvim
-GitHub: https://github.com/obrenoalvim/spotiPaper
+GitHub: https://github.com/obrenoalvim/spoti-paper
 
 /* THANKS */
 ColorThief: https://github.com/lokesh/color-thief

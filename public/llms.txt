@@ -43,4 +43,4 @@ https://spotipaper.vercel.app/
 
 ## Repositório
 
-https://github.com/obrenoalvim/spotiPaper
+https://github.com/obrenoalvim/spoti-paper
