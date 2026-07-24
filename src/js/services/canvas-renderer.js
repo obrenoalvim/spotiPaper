@@ -49,7 +49,8 @@ export class CanvasRenderer {
             this.renderDuration(data.durationText);
         }
 
-                const titleBottomY = this.renderTitle(data.trackTitle || '');
+                const titleOverride = (this.settings.titleOverride || '').trim();
+        const titleBottomY = this.renderTitle(titleOverride || data.trackTitle || '');
         this.renderSubtitle(data.subtitleText || '', titleBottomY);
 
                 await this.renderAlbumCover(data.albumCover);

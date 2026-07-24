@@ -26,6 +26,7 @@ export class SpotifyWallpaperApp {
 
     resetCustomizationToDefaults() {
         const defaults = {
+            titleOverride: '',
             bgColor: '#000000',
             accentColor: '#1db954',
             gradientStrength: '1',
@@ -42,7 +43,9 @@ export class SpotifyWallpaperApp {
         const textColor = document.getElementById('textColor');
         const vignetteIntensity = document.getElementById('vignetteIntensity');
         const showPalette = document.getElementById('showPalette');
+        const titleOverride = document.getElementById('titleOverride');
 
+        if (titleOverride) titleOverride.value = defaults.titleOverride;
         if (bgColor) bgColor.value = defaults.bgColor;
         if (accentColor) accentColor.value = defaults.accentColor;
         if (gradientStrength) gradientStrength.value = defaults.gradientStrength;
@@ -54,6 +57,7 @@ export class SpotifyWallpaperApp {
 
         getCustomizationSettings() {
         return {
+            titleOverride: document.getElementById('titleOverride')?.value || undefined,
             bgColor: document.getElementById('bgColor')?.value || undefined,
             accentColor: document.getElementById('accentColor')?.value || undefined,
             gradientStrength: parseFloat(document.getElementById('gradientStrength')?.value || '1'),
@@ -99,7 +103,7 @@ export class SpotifyWallpaperApp {
                 this.generateWallpaper(true);
             }
         });
-                const customIds = ['bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
+                const customIds = ['titleOverride','bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
         customIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
@@ -176,6 +180,11 @@ export class SpotifyWallpaperApp {
                 if (accentEl) accentEl.value = this.currentTrackData.dominant;
             }
 
+                        if (reset) {
+                const titleEl = document.getElementById('titleOverride');
+                if (titleEl) titleEl.value = this.currentTrackData?.trackTitle || '';
+            }
+
                         await this.renderer.renderWallpaper(this.currentTrackData, this.getCustomizationSettings());
             
                         updateMetadata(this.currentTrackData);
@@ -220,6 +229,9 @@ export class SpotifyWallpaperApp {
 
             const accentEl = document.getElementById('accentColor');
             if (accentEl && this.currentTrackData?.dominant) accentEl.value = this.currentTrackData.dominant;
+
+            const titleEl = document.getElementById('titleOverride');
+            if (titleEl) titleEl.value = this.currentTrackData?.trackTitle || '';
 
             await this.renderer.renderWallpaper(this.currentTrackData, this.getCustomizationSettings());
             updateMetadata(this.currentTrackData);
