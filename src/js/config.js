@@ -71,7 +71,7 @@ export const LANDSCAPE_LAYOUTS = {
     },
 
         cinematic: {
-        PALETTE: { START_X: 1260, START_Y: 90, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
+        PALETTE: { START_X: 1350, START_Y: 90, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
         DURATION: { X: 1820, Y: 100, ALIGN: 'right' },
         TITLE: { X: 320, Y: 855, ALIGN: 'left' },
         TEXT_MAX_WIDTH: 1300,
