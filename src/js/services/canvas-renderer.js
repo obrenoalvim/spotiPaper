@@ -1,5 +1,5 @@
 
-import { CANVAS_CONFIG, FONT_CONFIG, COLOR_CONFIG } from '../config.js';
+import { CANVAS_CONFIG, CANVAS_CONFIG_LANDSCAPE, FONT_CONFIG, COLOR_CONFIG } from '../config.js';
 import { wrapText } from '../utils/format-utils.js';
 
 export class CanvasRenderer {
@@ -10,12 +10,11 @@ export class CanvasRenderer {
     }
 
         async reset() {
-        const { WIDTH, HEIGHT } = CANVAS_CONFIG;
         this.settings = {};
         try {
             this.ctx.setTransform(1, 0, 0, 1, 0, 0);
             this.ctx.globalCompositeOperation = 'source-over';
-            this.ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         } catch (_) {  }
     }
 
@@ -24,8 +23,12 @@ export class CanvasRenderer {
     }
 
         async renderWallpaper(data, settings = null) {
-        const { WIDTH, HEIGHT } = CANVAS_CONFIG;
         this.settings = settings || {};
+        const cfg = this.settings.orientation === 'landscape' ? CANVAS_CONFIG_LANDSCAPE : CANVAS_CONFIG;
+        const { WIDTH, HEIGHT } = cfg;
+
+                this.canvas.width = WIDTH;
+        this.canvas.height = HEIGHT;
 
                 this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.globalCompositeOperation = 'source-over';
@@ -37,32 +40,32 @@ export class CanvasRenderer {
         this.ctx.fillStyle = baseBg;
         this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-                this.renderBackground(data);
+                this.renderBackground(data, cfg);
 
-                this.renderVignette();
+                this.renderVignette(cfg);
 
                 if (!this.settings || this.settings.showPalette !== false) {
-            this.renderColorPalette(data.palette || []);
+            this.renderColorPalette(data.palette || [], cfg.PALETTE);
         }
 
                 if (data.durationText && data.durationText !== '—' && data.durationText !== '0 MIN 00 S') {
-            this.renderDuration(data.durationText);
+            this.renderDuration(data.durationText, cfg.DURATION);
         }
 
                 const titleOverride = (this.settings.titleOverride || '').trim();
-        const titleBottomY = this.renderTitle(titleOverride || data.trackTitle || '');
-        this.renderSubtitle(data.subtitleText || '', titleBottomY);
+        const titleBottomY = this.renderTitle(titleOverride || data.trackTitle || '', cfg.TITLE, cfg.TEXT_MAX_WIDTH);
+        this.renderSubtitle(data.subtitleText || '', { X: cfg.TITLE.X, Y: titleBottomY }, cfg.TEXT_MAX_WIDTH);
 
-                await this.renderAlbumCover(data.albumCover);
+                await this.renderAlbumCover(data.albumCover, cfg.COVER);
 
-                await this.renderSpotifyCode(data.spotifyCodeImageUrl);
+                await this.renderSpotifyCode(data.spotifyCodeImageUrl, cfg.SPOTIFY_CODE);
     }
 
-        renderBackground(data) {
-        const { WIDTH, HEIGHT } = CANVAS_CONFIG;
+        renderBackground(data, cfg = CANVAS_CONFIG) {
+        const { WIDTH, HEIGHT } = cfg;
         const gradientStrength = typeof this.settings.gradientStrength === 'number' ? this.settings.gradientStrength : 1;
         const accent = this.settings.accentColor || data.dominant || COLOR_CONFIG.ACCENT || '#1db954';
-        
+
         let grad;
         const direction = this.settings.gradientDirection || 'vertical';
         if (direction === 'horizontal') {
@@ -90,11 +93,11 @@ export class CanvasRenderer {
         this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
 
-        renderVignette() {
+        renderVignette(cfg = CANVAS_CONFIG) {
         if (this.settings && this.settings.vignette === false) return;
         const intensity = typeof this.settings.vignetteIntensity === 'number' ? this.settings.vignetteIntensity : 0.4;
-        const { WIDTH, HEIGHT } = CANVAS_CONFIG;
-        
+        const { WIDTH, HEIGHT } = cfg;
+
         const vignetteGradient = this.ctx.createRadialGradient(
             WIDTH/2, HEIGHT/2, 0,
             WIDTH/2, HEIGHT/2, WIDTH * 0.8
@@ -105,8 +108,8 @@ export class CanvasRenderer {
         this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
 
-        renderColorPalette(palette) {
-        const { START_X, START_Y, COLOR_WIDTH, COLOR_HEIGHT, COLOR_GAP } = CANVAS_CONFIG.PALETTE;
+        renderColorPalette(palette, paletteCfg = CANVAS_CONFIG.PALETTE) {
+        const { START_X, START_Y, COLOR_WIDTH, COLOR_HEIGHT, COLOR_GAP } = paletteCfg;
 
         (palette || []).slice(0, 5).forEach((color, index) => {
             const x = START_X + (COLOR_WIDTH + COLOR_GAP) * index;
@@ -118,74 +121,55 @@ export class CanvasRenderer {
         });
     }
 
-        renderDuration(durationText) {
-        const { WIDTH } = CANVAS_CONFIG;
-        const { START_Y, COLOR_HEIGHT } = CANVAS_CONFIG.PALETTE;
-
+        renderDuration(durationText, pos = CANVAS_CONFIG.DURATION) {
         this.ctx.fillStyle = this.getTextColor();
         this.ctx.font = FONT_CONFIG.DURATION;
         this.ctx.textAlign = 'right';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(durationText, WIDTH - CANVAS_CONFIG.MARGINS.SIDE, START_Y + COLOR_HEIGHT/2);
+        this.ctx.fillText(durationText, pos.X, pos.Y);
     }
 
-        renderTitle(title) {
-        const { WIDTH } = CANVAS_CONFIG;
-        const { START_Y, COLOR_HEIGHT } = CANVAS_CONFIG.PALETTE;
-        const titleY = START_Y + COLOR_HEIGHT + 60;
-
+        renderTitle(title, pos = CANVAS_CONFIG.TITLE, maxWidth = CANVAS_CONFIG.TEXT_MAX_WIDTH) {
         this.ctx.fillStyle = this.getTextColor();
         this.ctx.font = FONT_CONFIG.TITLE;
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'top';
-        
+
         const titleText = (title || '').toUpperCase();
-        const maxTitleWidth = WIDTH - (CANVAS_CONFIG.MARGINS.SIDE * 2);
-        const titleLines = wrapText(this.ctx, titleText, maxTitleWidth);
-        
+        const titleLines = wrapText(this.ctx, titleText, maxWidth);
+
         titleLines.forEach((line, index) => {
-            this.ctx.fillText(line, CANVAS_CONFIG.MARGINS.SIDE, titleY + (index * 55));
+            this.ctx.fillText(line, pos.X, pos.Y + (index * 55));
         });
 
-        return titleY + (titleLines.length * 55) + 10;
+        return pos.Y + (titleLines.length * 55) + 10;
     }
 
-        renderSubtitle(subtitle, startY) {
-        const { WIDTH } = CANVAS_CONFIG;
-        const subtitleY = startY ?? (CANVAS_CONFIG.PALETTE.START_Y + CANVAS_CONFIG.PALETTE.COLOR_HEIGHT + 60);
-
+        renderSubtitle(subtitle, pos, maxWidth = CANVAS_CONFIG.TEXT_MAX_WIDTH) {
         this.ctx.fillStyle = this.getTextColor();
         this.ctx.font = FONT_CONFIG.SUBTITLE;
         this.ctx.textAlign = 'left';
         this.ctx.textBaseline = 'top';
-        
+
         const subtitleText = (subtitle || '').toUpperCase();
-        const maxSubtitleWidth = WIDTH - (CANVAS_CONFIG.MARGINS.SIDE * 2);
-        const subtitleLines = wrapText(this.ctx, subtitleText, maxSubtitleWidth);
-        
+        const subtitleLines = wrapText(this.ctx, subtitleText, maxWidth);
+
         subtitleLines.forEach((line, index) => {
-            this.ctx.fillText(line, CANVAS_CONFIG.MARGINS.SIDE, subtitleY + (index * 32));
+            this.ctx.fillText(line, pos.X, pos.Y + (index * 32));
         });
     }
 
-        async renderAlbumCover(albumCoverUrl) {
-        const { WIDTH } = CANVAS_CONFIG;
-        const { SIZE, BORDER_RADIUS, Y_POSITION } = CANVAS_CONFIG.COVER;
-        const coverX = (WIDTH - SIZE) / 2;
-        await this.drawRoundedImage(albumCoverUrl, coverX, Y_POSITION, SIZE, SIZE, BORDER_RADIUS);
+        async renderAlbumCover(albumCoverUrl, coverCfg = CANVAS_CONFIG.COVER) {
+        const { SIZE, BORDER_RADIUS, X, Y } = coverCfg;
+        await this.drawRoundedImage(albumCoverUrl, X, Y, SIZE, SIZE, BORDER_RADIUS);
     }
 
-        async renderSpotifyCode(spotifyCodeUrl) {
-        const { WIDTH } = CANVAS_CONFIG;
-        const { Y_POSITION, SIZE } = CANVAS_CONFIG.COVER;
-        const { WIDTH: CODE_WIDTH, HEIGHT: CODE_HEIGHT, Y_OFFSET } = CANVAS_CONFIG.SPOTIFY_CODE;
-        
-        const codeY = Y_POSITION + SIZE + Y_OFFSET;
-        const codeX = (WIDTH - CODE_WIDTH) / 2;
-        
+        async renderSpotifyCode(spotifyCodeUrl, codeCfg = CANVAS_CONFIG.SPOTIFY_CODE) {
+        const { WIDTH, HEIGHT, X, Y } = codeCfg;
+
         this.ctx.save();
         this.ctx.globalCompositeOperation = 'screen';
-        await this.drawImage(spotifyCodeUrl, codeX, codeY, CODE_WIDTH, CODE_HEIGHT);
+        await this.drawImage(spotifyCodeUrl, X, Y, WIDTH, HEIGHT);
         this.ctx.restore();
     }
 
@@ -194,7 +178,7 @@ export class CanvasRenderer {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.referrerPolicy = 'no-referrer';
-            
+
             img.onload = () => {
                 this.ctx.beginPath();
                 this.ctx.moveTo(x + radius, y);
@@ -207,15 +191,15 @@ export class CanvasRenderer {
                 this.ctx.lineTo(x, y + radius);
                 this.ctx.quadraticCurveTo(x, y, x + radius, y);
                 this.ctx.closePath();
-                
+
                 this.ctx.save();
                 this.ctx.clip();
                 this.ctx.drawImage(img, x, y, width, height);
                 this.ctx.restore();
-                
+
                 resolve();
             };
-            
+
             img.onerror = () => reject(new Error('Erro ao carregar capa'));
             img.src = src;
         });
@@ -226,17 +210,17 @@ export class CanvasRenderer {
             const img = new Image();
             img.referrerPolicy = 'no-referrer';
             img.crossOrigin = 'anonymous';
-            
+
             img.onload = () => {
                 this.ctx.drawImage(img, x, y, width, height);
                 resolve();
             };
-            
+
             img.onerror = () => {
                 console.warn('Não foi possível carregar Spotify Code');
                 resolve();
             };
-            
+
             img.src = src;
         });
     }

@@ -22,15 +22,47 @@ export const CANVAS_CONFIG = {
         COLOR_HEIGHT: 20,
         COLOR_GAP: 8
     },
+    DURATION: { X: 960, Y: 130 },
+    TITLE: { X: 120, Y: 200 },
+    TEXT_MAX_WIDTH: 840,
     COVER: {
         SIZE: 840,
         BORDER_RADIUS: 8,
-        Y_POSITION: 460
+        X: 120,
+        Y: 460
     },
     SPOTIFY_CODE: {
         WIDTH: 800,
         HEIGHT: 190,
-        Y_OFFSET: 64
+        X: 140,
+        Y: 1364
+    }
+};
+
+export const CANVAS_CONFIG_LANDSCAPE = {
+    WIDTH: 1920,
+    HEIGHT: 1080,
+    PALETTE: {
+        START_X: 960,
+        START_Y: 160,
+        COLOR_WIDTH: 56,
+        COLOR_HEIGHT: 20,
+        COLOR_GAP: 8
+    },
+    DURATION: { X: 1820, Y: 170 },
+    TITLE: { X: 960, Y: 220 },
+    TEXT_MAX_WIDTH: 860,
+    COVER: {
+        SIZE: 760,
+        BORDER_RADIUS: 8,
+        X: 100,
+        Y: 160
+    },
+    SPOTIFY_CODE: {
+        WIDTH: 700,
+        HEIGHT: 166,
+        X: 960,
+        Y: 814
     }
 };
 

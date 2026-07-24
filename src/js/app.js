@@ -26,6 +26,7 @@ export class SpotifyWallpaperApp {
 
     resetCustomizationToDefaults() {
         const defaults = {
+            orientation: 'portrait',
             titleOverride: '',
             bgColor: '#000000',
             accentColor: '#1db954',
@@ -44,7 +45,9 @@ export class SpotifyWallpaperApp {
         const vignetteIntensity = document.getElementById('vignetteIntensity');
         const showPalette = document.getElementById('showPalette');
         const titleOverride = document.getElementById('titleOverride');
+        const orientation = document.getElementById('orientation');
 
+        if (orientation) orientation.value = defaults.orientation;
         if (titleOverride) titleOverride.value = defaults.titleOverride;
         if (bgColor) bgColor.value = defaults.bgColor;
         if (accentColor) accentColor.value = defaults.accentColor;
@@ -57,6 +60,7 @@ export class SpotifyWallpaperApp {
 
         getCustomizationSettings() {
         return {
+            orientation: document.getElementById('orientation')?.value || 'portrait',
             titleOverride: document.getElementById('titleOverride')?.value || undefined,
             bgColor: document.getElementById('bgColor')?.value || undefined,
             accentColor: document.getElementById('accentColor')?.value || undefined,
@@ -103,7 +107,7 @@ export class SpotifyWallpaperApp {
                 this.generateWallpaper(true);
             }
         });
-                const customIds = ['titleOverride','bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
+                const customIds = ['orientation','titleOverride','bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
         customIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
