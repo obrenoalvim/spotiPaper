@@ -22,8 +22,8 @@ export const CANVAS_CONFIG = {
         COLOR_HEIGHT: 20,
         COLOR_GAP: 8
     },
-    DURATION: { X: 960, Y: 130 },
-    TITLE: { X: 120, Y: 200 },
+    DURATION: { X: 960, Y: 130, ALIGN: 'right' },
+    TITLE: { X: 120, Y: 200, ALIGN: 'left' },
     TEXT_MAX_WIDTH: 840,
     COVER: {
         SIZE: 840,
@@ -39,30 +39,44 @@ export const CANVAS_CONFIG = {
     }
 };
 
-export const CANVAS_CONFIG_LANDSCAPE = {
-    WIDTH: 1920,
-    HEIGHT: 1080,
-    PALETTE: {
-        START_X: 960,
-        START_Y: 160,
-        COLOR_WIDTH: 56,
-        COLOR_HEIGHT: 20,
-        COLOR_GAP: 8
+export const LANDSCAPE_SIZE = { WIDTH: 1920, HEIGHT: 1080 };
+
+export const LANDSCAPE_LAYOUTS = {
+        column: {
+        PALETTE: { START_X: 960, START_Y: 160, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
+        DURATION: { X: 1820, Y: 170, ALIGN: 'right' },
+        TITLE: { X: 960, Y: 220, ALIGN: 'left' },
+        TEXT_MAX_WIDTH: 860,
+        COVER: { SIZE: 760, BORDER_RADIUS: 8, X: 100, Y: 160 },
+        SPOTIFY_CODE: { WIDTH: 700, HEIGHT: 166, X: 960, Y: 814 }
     },
-    DURATION: { X: 1820, Y: 170 },
-    TITLE: { X: 960, Y: 220 },
-    TEXT_MAX_WIDTH: 860,
-    COVER: {
-        SIZE: 760,
-        BORDER_RADIUS: 8,
-        X: 100,
-        Y: 160
+
+        poster: {
+        BACKGROUND: 'radial',
+        PALETTE: { START_X: 804, START_Y: 560, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
+        DURATION: { X: 1820, Y: 90, ALIGN: 'right' },
+        TITLE: { X: 960, Y: 620, ALIGN: 'center' },
+        TEXT_MAX_WIDTH: 1200,
+        COVER: { SIZE: 460, BORDER_RADIUS: 8, X: 730, Y: 70 },
+        SPOTIFY_CODE: { WIDTH: 560, HEIGHT: 133, X: 680, Y: 840 }
     },
-    SPOTIFY_CODE: {
-        WIDTH: 700,
-        HEIGHT: 166,
-        X: 960,
-        Y: 814
+
+        editorial: {
+        PALETTE: { START_X: 100, START_Y: 430, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
+        DURATION: { X: 100, Y: 140, ALIGN: 'left' },
+        TITLE: { X: 100, Y: 200, ALIGN: 'left', FONT: 'bold 64px Inter, system-ui', LINE_HEIGHT: 70 },
+        TEXT_MAX_WIDTH: 940,
+        COVER: { SIZE: 700, BORDER_RADIUS: 8, X: 1120, Y: 190 },
+        SPOTIFY_CODE: { WIDTH: 620, HEIGHT: 147, X: 100, Y: 833 }
+    },
+
+        cinematic: {
+        PALETTE: { START_X: 1440, START_Y: 80, COLOR_WIDTH: 56, COLOR_HEIGHT: 20, COLOR_GAP: 8 },
+        DURATION: { X: 1820, Y: 90, ALIGN: 'right' },
+        TITLE: { X: 320, Y: 855, ALIGN: 'left' },
+        TEXT_MAX_WIDTH: 1300,
+        COVER: { SIZE: 180, BORDER_RADIUS: 8, X: 100, Y: 800 },
+        SPOTIFY_CODE: { WIDTH: 260, HEIGHT: 62, X: 1560, Y: 918 }
     }
 };
 

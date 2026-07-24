@@ -1,6 +1,16 @@
 
-import { CANVAS_CONFIG, CANVAS_CONFIG_LANDSCAPE, FONT_CONFIG, COLOR_CONFIG } from '../config.js';
+import { CANVAS_CONFIG, LANDSCAPE_SIZE, LANDSCAPE_LAYOUTS, FONT_CONFIG, COLOR_CONFIG } from '../config.js';
 import { wrapText } from '../utils/format-utils.js';
+
+function mixColor(c1, c2, t) {
+    const toRgb = (hex) => hex.replace('#','').match(/.{2}/g).map(n => parseInt(n,16));
+    const [r1,g1,b1] = toRgb(c1);
+    const [r2,g2,b2] = toRgb(c2);
+    const r = Math.round(r1 + (r2 - r1) * t);
+    const g = Math.round(g1 + (g2 - g1) * t);
+    const b = Math.round(b1 + (b2 - b1) * t);
+    return `rgb(${r}, ${g}, ${b})`;
+}
 
 export class CanvasRenderer {
     constructor(canvasId) {
@@ -24,44 +34,109 @@ export class CanvasRenderer {
 
         async renderWallpaper(data, settings = null) {
         this.settings = settings || {};
-        const cfg = this.settings.orientation === 'landscape' ? CANVAS_CONFIG_LANDSCAPE : CANVAS_CONFIG;
+
+                if (this.settings.orientation !== 'landscape') {
+            this.canvas.width = CANVAS_CONFIG.WIDTH;
+            this.canvas.height = CANVAS_CONFIG.HEIGHT;
+            await this.renderStandardWallpaper(data, CANVAS_CONFIG);
+            return;
+        }
+
+                this.canvas.width = LANDSCAPE_SIZE.WIDTH;
+        this.canvas.height = LANDSCAPE_SIZE.HEIGHT;
+
+        const styleName = LANDSCAPE_LAYOUTS[this.settings.landscapeStyle] ? this.settings.landscapeStyle : 'column';
+        const cfg = { ...LANDSCAPE_LAYOUTS[styleName], WIDTH: LANDSCAPE_SIZE.WIDTH, HEIGHT: LANDSCAPE_SIZE.HEIGHT };
+
+        if (styleName === 'cinematic') {
+            await this.renderCinematicWallpaper(data, cfg);
+        } else {
+            await this.renderStandardWallpaper(data, cfg);
+        }
+    }
+
+        async renderStandardWallpaper(data, cfg) {
         const { WIDTH, HEIGHT } = cfg;
 
-                this.canvas.width = WIDTH;
-        this.canvas.height = HEIGHT;
-
-                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.globalCompositeOperation = 'source-over';
         this.ctx.imageSmoothingEnabled = true;
         this.ctx.imageSmoothingQuality = 'high';
         this.ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-                const baseBg = this.settings.bgColor || COLOR_CONFIG.BACKGROUND;
+        const baseBg = this.settings.bgColor || COLOR_CONFIG.BACKGROUND;
         this.ctx.fillStyle = baseBg;
         this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-                this.renderBackground(data, cfg);
+        this.renderBackground(data, cfg);
+        this.renderVignette(cfg);
 
-                this.renderVignette(cfg);
-
-                if (!this.settings || this.settings.showPalette !== false) {
+        if (!this.settings || this.settings.showPalette !== false) {
             this.renderColorPalette(data.palette || [], cfg.PALETTE);
         }
 
-                if (data.durationText && data.durationText !== '—' && data.durationText !== '0 MIN 00 S') {
+        if (data.durationText && data.durationText !== '—' && data.durationText !== '0 MIN 00 S') {
             this.renderDuration(data.durationText, cfg.DURATION);
         }
 
-                const titleOverride = (this.settings.titleOverride || '').trim();
+        const titleOverride = (this.settings.titleOverride || '').trim();
         const titleBottomY = this.renderTitle(titleOverride || data.trackTitle || '', cfg.TITLE, cfg.TEXT_MAX_WIDTH);
-        this.renderSubtitle(data.subtitleText || '', { X: cfg.TITLE.X, Y: titleBottomY }, cfg.TEXT_MAX_WIDTH);
+        this.renderSubtitle(data.subtitleText || '', { X: cfg.TITLE.X, Y: titleBottomY, ALIGN: cfg.TITLE.ALIGN }, cfg.TEXT_MAX_WIDTH);
 
-                await this.renderAlbumCover(data.albumCover, cfg.COVER);
+        await this.renderAlbumCover(data.albumCover, cfg.COVER);
+        await this.renderSpotifyCode(data.spotifyCodeImageUrl, cfg.SPOTIFY_CODE);
+    }
 
-                await this.renderSpotifyCode(data.spotifyCodeImageUrl, cfg.SPOTIFY_CODE);
+        async renderCinematicWallpaper(data, cfg) {
+        const { WIDTH, HEIGHT } = cfg;
+
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+        this.ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        this.ctx.fillStyle = this.settings.bgColor || COLOR_CONFIG.BACKGROUND;
+        this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        await this.drawCoverBackdrop(data.albumCover, WIDTH, HEIGHT);
+        this.renderCinematicScrim(cfg);
+        this.renderVignette(cfg);
+
+        if (!this.settings || this.settings.showPalette !== false) {
+            this.renderColorPalette(data.palette || [], cfg.PALETTE);
+        }
+
+        if (data.durationText && data.durationText !== '—' && data.durationText !== '0 MIN 00 S') {
+            this.renderDuration(data.durationText, cfg.DURATION);
+        }
+
+        await this.renderAlbumCover(data.albumCover, cfg.COVER);
+
+        const titleOverride = (this.settings.titleOverride || '').trim();
+        const titleBottomY = this.renderTitle(titleOverride || data.trackTitle || '', cfg.TITLE, cfg.TEXT_MAX_WIDTH);
+        this.renderSubtitle(data.subtitleText || '', { X: cfg.TITLE.X, Y: titleBottomY, ALIGN: cfg.TITLE.ALIGN }, cfg.TEXT_MAX_WIDTH);
+
+        await this.renderSpotifyCode(data.spotifyCodeImageUrl, cfg.SPOTIFY_CODE);
+    }
+
+        renderCinematicScrim(cfg) {
+        const { WIDTH, HEIGHT } = cfg;
+        const grad = this.ctx.createLinearGradient(0, HEIGHT, 0, 0);
+        grad.addColorStop(0, 'rgba(0, 0, 0, 0.88)');
+        grad.addColorStop(0.42, 'rgba(0, 0, 0, 0.35)');
+        grad.addColorStop(0.68, 'rgba(0, 0, 0, 0.12)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
 
         renderBackground(data, cfg = CANVAS_CONFIG) {
+        if (cfg.BACKGROUND === 'radial') {
+            this.renderBackgroundRadial(data, cfg);
+            return;
+        }
+
         const { WIDTH, HEIGHT } = cfg;
         const gradientStrength = typeof this.settings.gradientStrength === 'number' ? this.settings.gradientStrength : 1;
         const accent = this.settings.accentColor || data.dominant || COLOR_CONFIG.ACCENT || '#1db954';
@@ -76,18 +151,21 @@ export class CanvasRenderer {
 
         const baseBg = this.settings.bgColor || COLOR_CONFIG.BACKGROUND;
         grad.addColorStop(0, baseBg);
+        grad.addColorStop(1, mixColor(baseBg, accent, Math.max(0, Math.min(1, gradientStrength))));
 
-        const mix = (c1, c2, t) => {
-            const toRgb = (hex) => hex.replace('#','').match(/.{2}/g).map(n => parseInt(n,16));
-            const [r1,g1,b1] = toRgb(c1);
-            const [r2,g2,b2] = toRgb(c2);
-            const r = Math.round(r1 + (r2 - r1) * t);
-            const g = Math.round(g1 + (g2 - g1) * t);
-            const b = Math.round(b1 + (b2 - b1) * t);
-            return `rgb(${r}, ${g}, ${b})`;
-        };
-        const endColor = mix(baseBg, accent, Math.max(0, Math.min(1, gradientStrength)));
-        grad.addColorStop(1, endColor);
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    }
+
+        renderBackgroundRadial(data, cfg) {
+        const { WIDTH, HEIGHT } = cfg;
+        const gradientStrength = typeof this.settings.gradientStrength === 'number' ? this.settings.gradientStrength : 1;
+        const accent = this.settings.accentColor || data.dominant || COLOR_CONFIG.ACCENT || '#1db954';
+        const baseBg = this.settings.bgColor || COLOR_CONFIG.BACKGROUND;
+
+        const grad = this.ctx.createRadialGradient(WIDTH / 2, HEIGHT * 0.35, 0, WIDTH / 2, HEIGHT * 0.35, WIDTH * 0.65);
+        grad.addColorStop(0, mixColor(baseBg, accent, Math.max(0, Math.min(1, gradientStrength))));
+        grad.addColorStop(1, baseBg);
 
         this.ctx.fillStyle = grad;
         this.ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -124,38 +202,42 @@ export class CanvasRenderer {
         renderDuration(durationText, pos = CANVAS_CONFIG.DURATION) {
         this.ctx.fillStyle = this.getTextColor();
         this.ctx.font = FONT_CONFIG.DURATION;
-        this.ctx.textAlign = 'right';
+        this.ctx.textAlign = pos.ALIGN || 'right';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(durationText, pos.X, pos.Y);
     }
 
         renderTitle(title, pos = CANVAS_CONFIG.TITLE, maxWidth = CANVAS_CONFIG.TEXT_MAX_WIDTH) {
+        const lineHeight = pos.LINE_HEIGHT || 55;
+
         this.ctx.fillStyle = this.getTextColor();
-        this.ctx.font = FONT_CONFIG.TITLE;
-        this.ctx.textAlign = 'left';
+        this.ctx.font = pos.FONT || FONT_CONFIG.TITLE;
+        this.ctx.textAlign = pos.ALIGN || 'left';
         this.ctx.textBaseline = 'top';
 
         const titleText = (title || '').toUpperCase();
         const titleLines = wrapText(this.ctx, titleText, maxWidth);
 
         titleLines.forEach((line, index) => {
-            this.ctx.fillText(line, pos.X, pos.Y + (index * 55));
+            this.ctx.fillText(line, pos.X, pos.Y + (index * lineHeight));
         });
 
-        return pos.Y + (titleLines.length * 55) + 10;
+        return pos.Y + (titleLines.length * lineHeight) + 10;
     }
 
         renderSubtitle(subtitle, pos, maxWidth = CANVAS_CONFIG.TEXT_MAX_WIDTH) {
+        const lineHeight = pos.LINE_HEIGHT || 32;
+
         this.ctx.fillStyle = this.getTextColor();
-        this.ctx.font = FONT_CONFIG.SUBTITLE;
-        this.ctx.textAlign = 'left';
+        this.ctx.font = pos.FONT || FONT_CONFIG.SUBTITLE;
+        this.ctx.textAlign = pos.ALIGN || 'left';
         this.ctx.textBaseline = 'top';
 
         const subtitleText = (subtitle || '').toUpperCase();
         const subtitleLines = wrapText(this.ctx, subtitleText, maxWidth);
 
         subtitleLines.forEach((line, index) => {
-            this.ctx.fillText(line, pos.X, pos.Y + (index * 32));
+            this.ctx.fillText(line, pos.X, pos.Y + (index * lineHeight));
         });
     }
 
@@ -221,6 +303,38 @@ export class CanvasRenderer {
                 resolve();
             };
 
+            img.src = src;
+        });
+    }
+
+        async drawCoverBackdrop(src, targetW, targetH) {
+                return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.referrerPolicy = 'no-referrer';
+
+            img.onload = () => {
+                const targetRatio = targetW / targetH;
+                const srcRatio = img.width / img.height;
+                let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+                if (srcRatio > targetRatio) {
+                    sw = img.height * targetRatio;
+                    sx = (img.width - sw) / 2;
+                } else {
+                    sh = img.width / targetRatio;
+                    sy = (img.height - sh) / 2;
+                }
+
+                this.ctx.save();
+                this.ctx.filter = 'blur(6px) saturate(0.9) brightness(0.75)';
+                this.ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+                this.ctx.restore();
+
+                resolve();
+            };
+
+            img.onerror = () => reject(new Error('Erro ao carregar capa'));
             img.src = src;
         });
     }

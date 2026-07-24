@@ -27,6 +27,7 @@ export class SpotifyWallpaperApp {
     resetCustomizationToDefaults() {
         const defaults = {
             orientation: 'portrait',
+            landscapeStyle: 'column',
             titleOverride: '',
             bgColor: '#000000',
             accentColor: '#1db954',
@@ -46,8 +47,10 @@ export class SpotifyWallpaperApp {
         const showPalette = document.getElementById('showPalette');
         const titleOverride = document.getElementById('titleOverride');
         const orientation = document.getElementById('orientation');
+        const landscapeStyle = document.getElementById('landscapeStyle');
 
         if (orientation) orientation.value = defaults.orientation;
+        if (landscapeStyle) landscapeStyle.value = defaults.landscapeStyle;
         if (titleOverride) titleOverride.value = defaults.titleOverride;
         if (bgColor) bgColor.value = defaults.bgColor;
         if (accentColor) accentColor.value = defaults.accentColor;
@@ -61,6 +64,7 @@ export class SpotifyWallpaperApp {
         getCustomizationSettings() {
         return {
             orientation: document.getElementById('orientation')?.value || 'portrait',
+            landscapeStyle: document.getElementById('landscapeStyle')?.value || 'column',
             titleOverride: document.getElementById('titleOverride')?.value || undefined,
             bgColor: document.getElementById('bgColor')?.value || undefined,
             accentColor: document.getElementById('accentColor')?.value || undefined,
@@ -107,7 +111,7 @@ export class SpotifyWallpaperApp {
                 this.generateWallpaper(true);
             }
         });
-                const customIds = ['orientation','titleOverride','bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
+                const customIds = ['orientation','landscapeStyle','titleOverride','bgColor','accentColor','gradientStrength','gradientDirection','textColor','vignetteIntensity','showPalette'];
         customIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
@@ -116,6 +120,15 @@ export class SpotifyWallpaperApp {
             }
         });
 
+                const orientationEl = document.getElementById('orientation');
+        orientationEl.addEventListener('change', () => this.syncLandscapeStyleVisibility());
+
+    }
+
+        syncLandscapeStyleVisibility() {
+        const group = document.getElementById('landscapeStyleGroup');
+        const orientation = document.getElementById('orientation')?.value;
+        if (group) group.style.display = orientation === 'landscape' ? '' : 'none';
     }
         async rerenderWithCurrentSettings() {
         if (!this.currentTrackData) return;
@@ -142,6 +155,7 @@ export class SpotifyWallpaperApp {
         try {
             if (reset) {
                                 this.resetCustomizationToDefaults();
+                                this.syncLandscapeStyleVisibility();
                                 await this.renderer.reset();
             }
 
